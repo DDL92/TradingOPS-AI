@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "daily": "bash scripts/daily-paper-run.sh",
     "dev": "tsx src/cli/backtest.ts",
     "typecheck": "tsc --noEmit",
     "backtest": "tsx src/cli/backtest.ts",

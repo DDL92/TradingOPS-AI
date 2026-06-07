@@ -7,3 +7,4 @@ data/historical/*.csv
 !data/historical/.gitkeep
 data/paper/*.json
 !data/paper/.gitkeep
+logs/
