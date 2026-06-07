@@ -35,6 +35,15 @@ npm run data:validate -- --symbol BTC
 npm run data:import -- --symbol BTC --file ./some/path/BTC.csv
 npm run compare:strategies -- --symbol BTC --data sample
 npm run compare:symbols -- --symbols BTC --strategy rsi --data sample
+npm run data:folders
+npm run data:normalize:yahoo
+npm run data:import:normalized
+npm run data:validate:all
+npm run analysis:realdata:initial
+npm run dataset:readiness
+npm run data:download -- --symbol BTC
+npm run data:download:all
+npm run data:pipeline
 ```
 
 ## Example Goal Output
@@ -123,6 +132,131 @@ npm run compare:symbols -- --symbols BTC,ETH,SPY,QQQ,NVDA,TSLA --strategy rsi --
 ```
 
 Historical performance does not guarantee future results.
+
+## Historical Data Workflow
+
+Sprint 3.5 automates local file preparation around manually downloaded Yahoo Finance CSVs. It does not fetch data online.
+
+Step 1: create folders.
+
+```bash
+npm run data:folders
+```
+
+Step 2: manually download Yahoo Finance daily historical CSV files:
+
+- `BTC-USD.csv`
+- `ETH-USD.csv`
+- `SPY.csv`
+- `QQQ.csv`
+- `NVDA.csv`
+- `TSLA.csv`
+
+Save them in:
+
+```text
+~/Downloads/trading-data/raw/
+```
+
+Step 3: normalize Yahoo CSVs into the project format.
+
+```bash
+npm run data:normalize:yahoo
+```
+
+Step 4: import normalized files into `data/historical/`.
+
+```bash
+npm run data:import:normalized
+```
+
+Step 5: validate all imported data.
+
+```bash
+npm run data:validate:all
+```
+
+Step 6: run initial real-data analysis.
+
+```bash
+npm run analysis:realdata:initial
+```
+
+Step 7: generate dataset readiness status.
+
+```bash
+npm run dataset:readiness
+```
+
+Yahoo CSVs usually include:
+
+```csv
+Date,Open,High,Low,Close,Adj Close,Volume
+```
+
+AI Trading Growth Lab normalizes to:
+
+```csv
+date,open,high,low,close,volume
+```
+
+Sprint 3.5 uses `Close`, not `Adj Close`, unless explicitly changed in a future sprint.
+
+Example one-symbol flow:
+
+```bash
+npm run data:import -- --symbol BTC --file ~/Downloads/trading-data/normalized/BTC.csv
+npm run data:validate -- --symbol BTC --data csv
+npm run backtest -- --symbol BTC --strategy rsi --data csv
+```
+
+Safety: no broker, no real trading, no live orders, no leverage, and no profit guarantee. Historical performance does not guarantee future results.
+
+## Automated Historical Data Download
+
+Sprint 3.5 can download historical daily OHLCV candles using `yahoo-finance2`. No API keys are required.
+
+Supported symbols:
+
+- `BTC` via Yahoo `BTC-USD`
+- `ETH` via Yahoo `ETH-USD`
+- `SPY`
+- `QQQ`
+- `NVDA`
+- `TSLA`
+
+Download one symbol:
+
+```bash
+npm run data:download -- --symbol BTC
+npm run data:download -- --symbol BTC --start 2020-01-01 --end 2026-01-01
+```
+
+Download all supported symbols:
+
+```bash
+npm run data:download:all
+```
+
+Run the full historical data pipeline:
+
+```bash
+npm run data:pipeline
+```
+
+Downloaded files are normalized to:
+
+```csv
+date,open,high,low,close,volume
+```
+
+Files are written to:
+
+```text
+data/historical/
+```
+
+If network access is unavailable, download commands fail clearly and no success is faked. The system remains simulation-only: no broker, no real-money execution, no live orders, no leverage, no margin, no options, no futures, and no profit guarantee. Historical data and backtests do not guarantee future results.
 
 ## Strategy MVP
 

@@ -1,0 +1,38 @@
+[
+  {
+    "internalSymbol": "BTC",
+    "yahooSymbol": "BTC-USD",
+    "rawFileName": "BTC-USD.csv",
+    "normalizedFileName": "BTC.csv"
+  },
+  {
+    "internalSymbol": "ETH",
+    "yahooSymbol": "ETH-USD",
+    "rawFileName": "ETH-USD.csv",
+    "normalizedFileName": "ETH.csv"
+  },
+  {
+    "internalSymbol": "SPY",
+    "yahooSymbol": "SPY",
+    "rawFileName": "SPY.csv",
+    "normalizedFileName": "SPY.csv"
+  },
+  {
+    "internalSymbol": "QQQ",
+    "yahooSymbol": "QQQ",
+    "rawFileName": "QQQ.csv",
+    "normalizedFileName": "QQQ.csv"
+  },
+  {
+    "internalSymbol": "NVDA",
+    "yahooSymbol": "NVDA",
+    "rawFileName": "NVDA.csv",
+    "normalizedFileName": "NVDA.csv"
+  },
+  {
+    "internalSymbol": "TSLA",
+    "yahooSymbol": "TSLA",
+    "rawFileName": "TSLA.csv",
+    "normalizedFileName": "TSLA.csv"
+  }
+]

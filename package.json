@@ -17,7 +17,16 @@
     "data:validate": "tsx src/cli/validateData.ts",
     "data:import": "tsx src/cli/importData.ts",
     "compare:symbols": "tsx src/cli/compareSymbols.ts",
-    "compare:strategies": "tsx src/cli/compareStrategies.ts"
+    "compare:strategies": "tsx src/cli/compareStrategies.ts",
+    "data:folders": "node scripts/prepare-trading-data-folders.mjs",
+    "data:normalize:yahoo": "node scripts/normalize-yahoo-csv.mjs",
+    "data:import:normalized": "node scripts/import-normalized-data.mjs",
+    "data:validate:all": "node scripts/validate-all-data.mjs",
+    "analysis:realdata:initial": "node scripts/run-initial-realdata-analysis.mjs",
+    "dataset:readiness": "tsx src/cli/datasetReadiness.ts",
+    "data:download": "tsx src/cli/downloadHistoricalData.ts",
+    "data:download:all": "tsx src/cli/downloadAllHistoricalData.ts",
+    "data:pipeline": "tsx src/cli/runHistoricalDataPipeline.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +37,7 @@
     "csv-parse": "^6.2.1",
     "date-fns": "^4.4.0",
     "dotenv": "^17.4.2",
+    "yahoo-finance2": "^3.15.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
