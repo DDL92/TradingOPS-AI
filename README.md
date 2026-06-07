@@ -31,6 +31,10 @@ npm run walkforward -- --symbol BTC --strategy rsi
 npm run montecarlo -- --symbol BTC --strategy rsi --capital 100 --target 1000
 npm run growth:project -- --capital 100 --target 1000 --months 6
 npm run paper:trade -- --symbol BTC --strategy rsi --capital 100
+npm run paper:watchlist
+npm run paper:scan -- --data csv --capital 100
+npm run paper:journal
+npm run paper:analyze
 npm run data:validate -- --symbol BTC
 npm run data:import -- --symbol BTC --file ./some/path/BTC.csv
 npm run compare:strategies -- --symbol BTC --data sample
@@ -74,6 +78,14 @@ Generated reports are written to:
 - `output/reports/growth-projection.md`
 - `output/reports/paper-trade-session.json`
 - `output/reports/paper-trade-session.md`
+- `output/reports/paper-watchlist-report.json`
+- `output/reports/paper-watchlist-report.md`
+- `output/reports/paper-scan-report.json`
+- `output/reports/paper-scan-report.md`
+- `output/reports/paper-journal-report.json`
+- `output/reports/paper-journal-report.md`
+- `output/reports/paper-analysis-report.json`
+- `output/reports/paper-analysis-report.md`
 - `output/reports/BTC-data-validation.json`
 - `output/reports/BTC-data-validation.md`
 - `output/leaderboards/BTC-realdata-strategy-comparison.json`
@@ -258,6 +270,30 @@ data/historical/
 
 If network access is unavailable, download commands fail clearly and no success is faked. The system remains simulation-only: no broker, no real-money execution, no live orders, no leverage, no margin, no options, no futures, and no profit guarantee. Historical data and backtests do not guarantee future results.
 
+## Persistent Paper Trading Journal
+
+Sprint 4 adds a persistent paper-trading journal for forward-testing strategy signals against local historical CSV data. This is still research-only. Simulation only. Real trading is disabled.
+
+Workflow:
+
+```bash
+npm run data:pipeline
+npm run paper:watchlist
+npm run paper:scan -- --data csv --capital 100
+npm run paper:journal
+npm run paper:analyze
+```
+
+Generated local journal files:
+
+```text
+data/paper/paper-watchlist.json
+data/paper/paper-signals.json
+data/paper/paper-trades.json
+```
+
+These JSON files are ignored by git because they are local research state. The default watchlist is marked `PAPER_TEST_ONLY` with `realMoneyAllowed: false`. Promotion analysis requires forward paper validation and always states: Manual review required. Real-money trading remains disabled.
+
 ## Strategy MVP
 
 - RSI Mean Reversion: buys when RSI is below 30 and sells above 55.
@@ -275,7 +311,7 @@ Backtests are long-only, no leverage, one open position at a time, and use 25% o
 - Walk-forward testing checks consistency across sequential train/test windows.
 - Monte Carlo simulation reshuffles backtest trade returns with a seeded pseudo-random function.
 - Growth projection explains required total, monthly, weekly, and daily returns.
-- Paper trading is a local simulation only with no broker connection and no persistence.
+- Paper trading is a local simulation only with no broker connection. Sprint 4 adds persistent local paper-journal JSON files for forward testing.
 
 Every Sprint 2 output states: Mode: simulation only. Real trading is disabled.
 
@@ -295,8 +331,8 @@ Phase 1 completed: MVP with backtesting and goal feasibility.
 
 Phase 2 completed: advanced validation with walk-forward testing, Monte Carlo, growth projection, risk scoring, and paper trading simulation.
 
-Phase 3 next: real historical data provider.
+Phase 3 completed: real historical data provider and local CSV validation.
 
-Phase 4 next: persistent paper trading database.
+Phase 4 completed: persistent paper trading journal and forward-testing reports.
 
-Phase 5 later: broker integration with manual approval only.
+Phase 5 later: research tooling improvements only. Broker integration and real-money execution remain out of scope.

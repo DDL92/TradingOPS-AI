@@ -1,4 +1,4 @@
-export type TradeDirection = "long" | "short";
+export type TradeDirection = "long";
 export type TradeResult = "win" | "loss" | "breakeven";
 
 export type Trade = {

@@ -37,9 +37,9 @@ export function projectGrowth(capital: number, target: number, months: number): 
     riskExplanation: buildRiskExplanation(requiredTotalReturnPercent),
     saferMilestonePlan: [
       "Month 1: validate system, no real money.",
-      "Month 2: paper trading only.",
-      "Month 3: micro real trades only if externally approved in a future sprint; Sprint 2 remains simulation-only.",
-      "Month 4-6: scale only if drawdown is controlled and expectancy is positive.",
+      "Month 2: persistent paper simulation only.",
+      "Month 3: continue forward paper validation. Real-money trading remains disabled.",
+      "Month 4-6: review drawdown, expectancy, and journal quality in simulation only.",
     ],
     mode: "simulation only",
   };

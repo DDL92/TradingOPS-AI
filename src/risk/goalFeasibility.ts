@@ -35,7 +35,7 @@ export function checkGoalFeasibility(capital: number, monthlyTarget: number): Go
     riskWarning: getRiskWarning(feasibilityCategory),
     recommendedNextStep: isExtreme
       ? "Run simulations, backtesting, trade-history analysis, and risk audits only. Do not use real money for this target."
-      : "Validate with backtesting and paper trading before considering any real-money decision.",
+      : "Validate with backtesting, persistent paper simulation, and risk audits only. Real-money trading remains disabled.",
   };
 }
 
