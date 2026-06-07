@@ -9,7 +9,11 @@
     "backtest": "tsx src/cli/backtest.ts",
     "rank:strategies": "tsx src/cli/rankStrategies.ts",
     "goal:check": "tsx src/cli/goalCheck.ts",
-    "journal:analyze": "tsx src/cli/analyzeTrades.ts"
+    "journal:analyze": "tsx src/cli/analyzeTrades.ts",
+    "walkforward": "tsx src/cli/walkForward.ts",
+    "montecarlo": "tsx src/cli/monteCarlo.ts",
+    "growth:project": "tsx src/cli/projectGrowth.ts",
+    "paper:trade": "tsx src/cli/paperTrade.ts"
   },
   "keywords": [],
   "author": "",

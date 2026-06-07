@@ -27,6 +27,10 @@ npm run goal:check -- --capital 100 --target 1000
 npm run backtest -- --symbol BTC --strategy rsi
 npm run rank:strategies -- --symbol BTC
 npm run journal:analyze
+npm run walkforward -- --symbol BTC --strategy rsi
+npm run montecarlo -- --symbol BTC --strategy rsi --capital 100 --target 1000
+npm run growth:project -- --capital 100 --target 1000 --months 6
+npm run paper:trade -- --symbol BTC --strategy rsi --capital 100
 ```
 
 ## Example Goal Output
@@ -49,14 +53,35 @@ Generated reports are written to:
 - `output/leaderboards/BTC-strategy-leaderboard.md`
 - `output/reports/trade-journal-analysis.json`
 - `output/reports/trade-journal-analysis.md`
+- `output/backtests/BTC-rsi-walkforward.json`
+- `output/backtests/BTC-rsi-walkforward.md`
+- `output/backtests/BTC-rsi-montecarlo.json`
+- `output/backtests/BTC-rsi-montecarlo.md`
+- `output/reports/growth-projection.json`
+- `output/reports/growth-projection.md`
+- `output/reports/paper-trade-session.json`
+- `output/reports/paper-trade-session.md`
 
 ## Strategy MVP
 
 - RSI Mean Reversion: buys when RSI is below 30 and sells above 55.
 - EMA Crossover: buys when EMA 9 crosses above EMA 21 and sells when it crosses below.
 - Breakout: buys above the previous 20-candle high and sells below the previous 10-candle low.
+- MACD Confirmation: buys when MACD crosses above signal and sells when it crosses below.
+- Volume Breakout: requires breakout plus 1.5x volume confirmation.
+- Support Resistance Bounce: buys near support after a green close and sells near resistance or support failure.
+- VWAP Approximation: trades close/VWAP crossovers.
 
 Backtests are long-only, no leverage, one open position at a time, and use 25% of available simulation capital per trade.
+
+## Sprint 2 Validation
+
+- Walk-forward testing checks consistency across sequential train/test windows.
+- Monte Carlo simulation reshuffles backtest trade returns with a seeded pseudo-random function.
+- Growth projection explains required total, monthly, weekly, and daily returns.
+- Paper trading is a local simulation only with no broker connection and no persistence.
+
+Every Sprint 2 output states: Mode: simulation only. Real trading is disabled.
 
 ## Paper Trading Risk Rules
 
@@ -70,12 +95,12 @@ A strategy is rejected unless it meets all of these conditions:
 
 ## Roadmap
 
-Phase 1: backtesting and goal feasibility.
+Phase 1 completed: MVP with backtesting and goal feasibility.
 
-Phase 2: paper trading.
+Phase 2 completed: advanced validation with walk-forward testing, Monte Carlo, growth projection, risk scoring, and paper trading simulation.
 
-Phase 3: external market data.
+Phase 3 next: real historical data provider.
 
-Phase 4: broker integration with manual approval.
+Phase 4 next: persistent paper trading database.
 
-Phase 5: controlled automation with kill switch.
+Phase 5 later: broker integration with manual approval only.

@@ -28,6 +28,8 @@ program
         strategy: entry.strategyKey,
         score: entry.score,
         approved: entry.approvedForPaperTrading,
+        risk: entry.riskLevel,
+        riskScore: entry.riskScore,
         trades: entry.metrics.totalTrades,
         profitFactor: entry.metrics.profitFactor,
         drawdown: entry.metrics.maxDrawdownPercent,
@@ -42,14 +44,14 @@ function leaderboardMarkdown(symbol: string, leaderboard: LeaderboardEntry[]): s
   const rows = leaderboard
     .map(
       (entry) =>
-        `| ${entry.rank} | ${entry.strategy} | ${entry.score} | ${entry.approvedForPaperTrading ? "Yes" : "No"} | ${entry.metrics.totalTrades} | ${entry.metrics.winRate}% | ${entry.metrics.profitFactor} | ${entry.metrics.maxDrawdownPercent}% | ${entry.mainReason} |`,
+        `| ${entry.rank} | ${entry.strategy} | ${entry.score} | ${entry.approvedForPaperTrading ? "Yes" : "No"} | ${entry.metrics.totalTrades} | ${entry.metrics.winRate}% | ${entry.metrics.profitFactor} | ${entry.metrics.maxDrawdownPercent}% | ${entry.riskLevel} (${entry.riskScore}) | ${entry.mainReason} |`,
     )
     .join("\n");
 
   return `# ${symbol} Strategy Leaderboard
 
-| Rank | Strategy | Score | Paper Trading Approved | Trades | Win Rate | Profit Factor | Max Drawdown | Main Reason |
-| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
+| Rank | Strategy | Score | Paper Trading Approved | Trades | Win Rate | Profit Factor | Max Drawdown | Risk | Main Reason |
+| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
 ${rows}
 
 This leaderboard is based on local sample data only and does not predict future returns.

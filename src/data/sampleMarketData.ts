@@ -1,4 +1,4 @@
-import { addDays, formatISO } from "date-fns";
+import { addDays, format } from "date-fns";
 import type { MarketCandle } from "../types/market.types";
 
 export const sampleMarketData: Record<string, MarketCandle[]> = {
@@ -16,7 +16,7 @@ export function getMarketData(symbol: string): MarketCandle[] {
 }
 
 function generateBtcCandles(): MarketCandle[] {
-  const startDate = new Date("2025-01-01T00:00:00.000Z");
+  const startDate = new Date(2025, 0, 1);
   const candles: MarketCandle[] = [];
   let previousClose = 42000;
 
@@ -33,7 +33,7 @@ function generateBtcCandles(): MarketCandle[] {
 
     candles.push({
       symbol: "BTC",
-      date: formatISO(addDays(startDate, index), { representation: "date" }),
+      date: format(addDays(startDate, index), "yyyy-MM-dd"),
       open,
       high,
       low,

@@ -1,5 +1,6 @@
 import { runBacktest } from "../backtesting/backtestEngine";
 import { getMarketData } from "../data/sampleMarketData";
+import { calculateRiskScore, type RiskLevel } from "../risk/riskScore";
 import { strategies } from "../strategies/strategyRegistry";
 import type { BacktestResult } from "../types/backtest.types";
 
@@ -9,6 +10,8 @@ export type LeaderboardEntry = {
   strategyKey: string;
   score: number;
   approvedForPaperTrading: boolean;
+  riskScore: number;
+  riskLevel: RiskLevel;
   mainReason: string;
   metrics: {
     totalReturnPercent: number;
@@ -33,12 +36,16 @@ export function buildStrategyLeaderboard(symbol: string): LeaderboardEntry[] {
 }
 
 function toLeaderboardEntry(result: BacktestResult, strategyName: string): LeaderboardEntry {
+  const risk = calculateRiskScore(result);
+
   return {
     rank: 0,
     strategy: strategyName,
     strategyKey: result.strategy,
     score: scoreBacktest(result),
     approvedForPaperTrading: result.approvedForPaperTrading,
+    riskScore: risk.score,
+    riskLevel: risk.level,
     mainReason: result.approvedForPaperTrading
       ? "Passed all paper-trading validation rules."
       : result.rejectionReasons[0] ?? "Insufficient evidence for paper trading.",
