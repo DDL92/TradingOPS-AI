@@ -1,0 +1,30 @@
+{
+  "name": "ai-trading-growth-lab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx src/cli/backtest.ts",
+    "typecheck": "tsc --noEmit",
+    "backtest": "tsx src/cli/backtest.ts",
+    "rank:strategies": "tsx src/cli/rankStrategies.ts",
+    "goal:check": "tsx src/cli/goalCheck.ts",
+    "journal:analyze": "tsx src/cli/analyzeTrades.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "commander": "^15.0.0",
+    "csv-parse": "^6.2.1",
+    "date-fns": "^4.4.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}
