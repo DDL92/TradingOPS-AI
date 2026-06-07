@@ -31,6 +31,10 @@ npm run walkforward -- --symbol BTC --strategy rsi
 npm run montecarlo -- --symbol BTC --strategy rsi --capital 100 --target 1000
 npm run growth:project -- --capital 100 --target 1000 --months 6
 npm run paper:trade -- --symbol BTC --strategy rsi --capital 100
+npm run data:validate -- --symbol BTC
+npm run data:import -- --symbol BTC --file ./some/path/BTC.csv
+npm run compare:strategies -- --symbol BTC --data sample
+npm run compare:symbols -- --symbols BTC --strategy rsi --data sample
 ```
 
 ## Example Goal Output
@@ -61,6 +65,64 @@ Generated reports are written to:
 - `output/reports/growth-projection.md`
 - `output/reports/paper-trade-session.json`
 - `output/reports/paper-trade-session.md`
+- `output/reports/BTC-data-validation.json`
+- `output/reports/BTC-data-validation.md`
+- `output/leaderboards/BTC-realdata-strategy-comparison.json`
+- `output/leaderboards/BTC-realdata-strategy-comparison.md`
+- `output/leaderboards/multi-symbol-rsi-comparison.json`
+- `output/leaderboards/multi-symbol-rsi-comparison.md`
+
+## Historical CSV Data
+
+Sprint 3 supports local CSV files only. No API keys, paid APIs, broker connections, or live orders are used.
+
+Expected CSV columns:
+
+```csv
+date,open,high,low,close,volume
+2024-01-01,42000,43000,41000,42500,123456
+```
+
+Rules:
+
+- `date` must be parseable.
+- `open`, `high`, `low`, `close`, and `volume` must be numeric.
+- `high` must be greater than or equal to open, close, and low.
+- `low` must be less than or equal to open, close, and high.
+- `volume` must be greater than or equal to 0.
+- Duplicate dates are rejected.
+- Rows are sorted by date before simulation.
+
+Import local data:
+
+```bash
+npm run data:import -- --symbol BTC --file ./some/path/BTC.csv
+```
+
+Validate data:
+
+```bash
+npm run data:validate -- --symbol BTC --data csv
+```
+
+Run simulations with CSV data:
+
+```bash
+npm run backtest -- --symbol BTC --strategy rsi --data csv
+npm run rank:strategies -- --symbol BTC --data csv
+npm run walkforward -- --symbol BTC --strategy rsi --data csv
+npm run montecarlo -- --symbol BTC --strategy rsi --capital 100 --target 1000 --data csv
+npm run paper:trade -- --symbol BTC --strategy rsi --capital 100 --data csv
+```
+
+Compare:
+
+```bash
+npm run compare:strategies -- --symbol BTC --data csv
+npm run compare:symbols -- --symbols BTC,ETH,SPY,QQQ,NVDA,TSLA --strategy rsi --data csv
+```
+
+Historical performance does not guarantee future results.
 
 ## Strategy MVP
 

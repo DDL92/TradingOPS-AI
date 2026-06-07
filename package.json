@@ -13,7 +13,11 @@
     "walkforward": "tsx src/cli/walkForward.ts",
     "montecarlo": "tsx src/cli/monteCarlo.ts",
     "growth:project": "tsx src/cli/projectGrowth.ts",
-    "paper:trade": "tsx src/cli/paperTrade.ts"
+    "paper:trade": "tsx src/cli/paperTrade.ts",
+    "data:validate": "tsx src/cli/validateData.ts",
+    "data:import": "tsx src/cli/importData.ts",
+    "compare:symbols": "tsx src/cli/compareSymbols.ts",
+    "compare:strategies": "tsx src/cli/compareStrategies.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runMonteCarloSimulation, type MonteCarloResult } from "../backtesting/monteCarloSimulator";
-import { writeAndLogJsonReports } from "./cliOutput";
-import { getMarketData } from "../data/sampleMarketData";
+import { handleCliError, writeAndLogJsonReports } from "./cliOutput";
+import { createMarketDataProvider, parseMarketDataSource } from "../data/marketDataProviderFactory";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
@@ -10,6 +10,7 @@ const optionsSchema = z.object({
   strategy: z.string().default("rsi"),
   capital: z.coerce.number().positive().default(100),
   target: z.coerce.number().positive().optional(),
+  data: z.string().default("sample"),
 });
 
 const program = new Command();
@@ -21,19 +22,25 @@ program
   .option("--strategy <key>", "Strategy key", "rsi")
   .option("--capital <amount>", "Starting simulation capital", "100")
   .option("--target <amount>", "Optional target capital")
+  .option("--data <source>", "Market data source: sample or csv", "sample")
   .action((rawOptions) => {
-    const options = optionsSchema.parse(rawOptions);
-    const symbol = options.symbol.toUpperCase();
-    const strategy = getStrategyByKey(options.strategy);
-    const result = runMonteCarloSimulation(getMarketData(symbol), strategy, options.capital, options.target);
-    const basePath = `output/backtests/${symbol}-${strategy.key}-montecarlo`;
+    try {
+      const options = optionsSchema.parse(rawOptions);
+      const symbol = options.symbol.toUpperCase();
+      const provider = createMarketDataProvider(parseMarketDataSource(options.data));
+      const strategy = getStrategyByKey(options.strategy);
+      const result = runMonteCarloSimulation(provider.getCandles(symbol), strategy, options.capital, options.target);
+      const basePath = `output/backtests/${symbol}-${strategy.key}-montecarlo`;
 
-    writeAndLogJsonReports({
-      jsonPath: `${basePath}.json`,
-      markdownPath: `${basePath}.md`,
-      data: result,
-      markdown: monteCarloMarkdown(result),
-    });
+      writeAndLogJsonReports({
+        jsonPath: `${basePath}.json`,
+        markdownPath: `${basePath}.md`,
+        data: result,
+        markdown: monteCarloMarkdown(result),
+      });
+    } catch (error) {
+      handleCliError(error);
+    }
   });
 
 program.parse();

@@ -1,5 +1,6 @@
 import { runBacktest } from "../backtesting/backtestEngine";
-import { getMarketData } from "../data/sampleMarketData";
+import { createMarketDataProvider } from "../data/marketDataProviderFactory";
+import type { MarketDataProvider } from "../data/marketDataProvider.interface";
 import { calculateRiskScore, type RiskLevel } from "../risk/riskScore";
 import { strategies } from "../strategies/strategyRegistry";
 import type { BacktestResult } from "../types/backtest.types";
@@ -23,8 +24,8 @@ export type LeaderboardEntry = {
   };
 };
 
-export function buildStrategyLeaderboard(symbol: string): LeaderboardEntry[] {
-  const candles = getMarketData(symbol);
+export function buildStrategyLeaderboard(symbol: string, provider: MarketDataProvider = createMarketDataProvider("sample")): LeaderboardEntry[] {
+  const candles = provider.getCandles(symbol);
 
   return strategies
     .map((strategy) => {

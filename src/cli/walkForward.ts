@@ -1,13 +1,14 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runWalkForwardTest, type WalkForwardResult } from "../backtesting/walkForwardTester";
-import { writeAndLogJsonReports } from "./cliOutput";
-import { getMarketData } from "../data/sampleMarketData";
+import { handleCliError, writeAndLogJsonReports } from "./cliOutput";
+import { createMarketDataProvider, parseMarketDataSource } from "../data/marketDataProviderFactory";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
   symbol: z.string().default("BTC"),
   strategy: z.string().default("rsi"),
+  data: z.string().default("sample"),
 });
 
 const program = new Command();
@@ -17,19 +18,25 @@ program
   .description("Run simulation-only walk-forward testing using local sample market data.")
   .option("--symbol <symbol>", "Local sample symbol", "BTC")
   .option("--strategy <key>", "Strategy key", "rsi")
+  .option("--data <source>", "Market data source: sample or csv", "sample")
   .action((rawOptions) => {
-    const options = optionsSchema.parse(rawOptions);
-    const symbol = options.symbol.toUpperCase();
-    const strategy = getStrategyByKey(options.strategy);
-    const result = runWalkForwardTest(getMarketData(symbol), strategy);
-    const basePath = `output/backtests/${symbol}-${strategy.key}-walkforward`;
+    try {
+      const options = optionsSchema.parse(rawOptions);
+      const symbol = options.symbol.toUpperCase();
+      const provider = createMarketDataProvider(parseMarketDataSource(options.data));
+      const strategy = getStrategyByKey(options.strategy);
+      const result = runWalkForwardTest(provider.getCandles(symbol), strategy);
+      const basePath = `output/backtests/${symbol}-${strategy.key}-walkforward`;
 
-    writeAndLogJsonReports({
-      jsonPath: `${basePath}.json`,
-      markdownPath: `${basePath}.md`,
-      data: result,
-      markdown: walkForwardMarkdown(result),
-    });
+      writeAndLogJsonReports({
+        jsonPath: `${basePath}.json`,
+        markdownPath: `${basePath}.md`,
+        data: result,
+        markdown: walkForwardMarkdown(result),
+      });
+    } catch (error) {
+      handleCliError(error);
+    }
   });
 
 program.parse();

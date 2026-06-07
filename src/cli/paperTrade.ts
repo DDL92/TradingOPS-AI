@@ -1,14 +1,15 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runPaperTradingSession, type PaperTradingSession } from "../paperTrading/paperTradingEngine";
-import { logJsonResult, logReportPaths, writeCliReports } from "./cliOutput";
-import { getMarketData } from "../data/sampleMarketData";
+import { handleCliError, logJsonResult, logReportPaths, writeCliReports } from "./cliOutput";
+import { createMarketDataProvider, parseMarketDataSource } from "../data/marketDataProviderFactory";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
   symbol: z.string().default("BTC"),
   strategy: z.string().default("rsi"),
   capital: z.coerce.number().positive().default(100),
+  data: z.string().default("sample"),
 });
 
 const program = new Command();
@@ -19,22 +20,28 @@ program
   .option("--symbol <symbol>", "Local sample symbol", "BTC")
   .option("--strategy <key>", "Strategy key", "rsi")
   .option("--capital <amount>", "Starting paper capital", "100")
+  .option("--data <source>", "Market data source: sample or csv", "sample")
   .action((rawOptions) => {
-    const options = optionsSchema.parse(rawOptions);
-    const symbol = options.symbol.toUpperCase();
-    const strategy = getStrategyByKey(options.strategy);
-    const result = runPaperTradingSession(getMarketData(symbol), strategy, options.capital);
-    const jsonPath = "output/reports/paper-trade-session.json";
-    const markdownPath = "output/reports/paper-trade-session.md";
+    try {
+      const options = optionsSchema.parse(rawOptions);
+      const symbol = options.symbol.toUpperCase();
+      const provider = createMarketDataProvider(parseMarketDataSource(options.data));
+      const strategy = getStrategyByKey(options.strategy);
+      const result = runPaperTradingSession(provider.getCandles(symbol), strategy, options.capital);
+      const jsonPath = "output/reports/paper-trade-session.json";
+      const markdownPath = "output/reports/paper-trade-session.md";
 
-    writeCliReports({
-      jsonPath,
-      markdownPath,
-      data: result,
-      markdown: paperTradeMarkdown(result),
-    });
-    logJsonResult(toConsoleSummary(result));
-    logReportPaths(jsonPath, markdownPath);
+      writeCliReports({
+        jsonPath,
+        markdownPath,
+        data: result,
+        markdown: paperTradeMarkdown(result),
+      });
+      logJsonResult(toConsoleSummary(result));
+      logReportPaths(jsonPath, markdownPath);
+    } catch (error) {
+      handleCliError(error);
+    }
   });
 
 program.parse();

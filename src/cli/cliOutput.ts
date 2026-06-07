@@ -55,3 +55,9 @@ export function writeAndLogTableReports<T>(options: {
   console.table(options.rows);
   logReportPaths(options.jsonPath, options.markdownPath);
 }
+
+export function handleCliError(error: unknown): void {
+  const message = error instanceof Error ? error.message : "Unknown command error.";
+  console.error(`Error: ${message}`);
+  process.exitCode = 1;
+}
