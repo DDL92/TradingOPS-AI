@@ -1,3 +1,4 @@
+import { calculateEmaAt } from "../indicators";
 import type { MarketCandle } from "../types/market.types";
 import type { Strategy, StrategySignal } from "../types/strategy.types";
 
@@ -34,25 +35,6 @@ export class EmaCrossoverStrategy implements Strategy {
 
     return { action: "HOLD", reason: "No EMA crossover.", confidence: 0.3 };
   }
-}
-
-function calculateEmaAt(candles: MarketCandle[], index: number, period: number): number | null {
-  if (index < period - 1) return null;
-
-  const smoothing = 2 / (period + 1);
-  let ema = averageClose(candles.slice(0, period));
-
-  for (let cursor = period; cursor <= index; cursor += 1) {
-    const candle = candles[cursor];
-    if (!candle) return null;
-    ema = candle.close * smoothing + ema * (1 - smoothing);
-  }
-
-  return ema;
-}
-
-function averageClose(candles: MarketCandle[]): number {
-  return candles.reduce((sum, candle) => sum + candle.close, 0) / candles.length;
 }
 
 function crossoverConfidence(fast: number, slow: number): number {

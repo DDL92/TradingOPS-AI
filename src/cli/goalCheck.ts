@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { z } from "zod";
+import { writeAndLogJsonReports } from "./cliOutput";
 import { checkGoalFeasibility } from "../risk/goalFeasibility";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 
 const optionsSchema = z.object({
   capital: z.coerce.number().positive(),
@@ -19,11 +19,12 @@ program
     const options = optionsSchema.parse(rawOptions);
     const result = checkGoalFeasibility(options.capital, options.target);
 
-    writeJsonReport("output/reports/goal-feasibility.json", result);
-    writeMarkdownReport("output/reports/goal-feasibility.md", goalMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log("Reports written to output/reports/goal-feasibility.json and output/reports/goal-feasibility.md");
+    writeAndLogJsonReports({
+      jsonPath: "output/reports/goal-feasibility.json",
+      markdownPath: "output/reports/goal-feasibility.md",
+      data: result,
+      markdown: goalMarkdown(result),
+    });
   });
 
 program.parse();

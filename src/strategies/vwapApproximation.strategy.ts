@@ -1,3 +1,4 @@
+import { calculateVwap } from "../indicators";
 import type { MarketCandle } from "../types/market.types";
 import type { Strategy, StrategySignal } from "../types/strategy.types";
 
@@ -37,21 +38,6 @@ export class VwapApproximationStrategy implements Strategy {
 
     return { action: "HOLD", reason: "No VWAP crossover.", confidence: 0.28 };
   }
-}
-
-function calculateVwap(candles: MarketCandle[], index: number): number | null {
-  let cumulativeTypicalVolume = 0;
-  let cumulativeVolume = 0;
-
-  for (let cursor = 0; cursor <= index; cursor += 1) {
-    const candle = candles[cursor];
-    if (!candle) return null;
-    const typicalPrice = (candle.high + candle.low + candle.close) / 3;
-    cumulativeTypicalVolume += typicalPrice * candle.volume;
-    cumulativeVolume += candle.volume;
-  }
-
-  return cumulativeVolume === 0 ? null : cumulativeTypicalVolume / cumulativeVolume;
 }
 
 function vwapConfidence(close: number, vwap: number): number {

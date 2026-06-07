@@ -22,8 +22,8 @@ export function evaluateCapitalProtection(result: BacktestResult): CapitalProtec
     messages.push(`Do not approve strategy with fewer than ${tradingConfig.minimumTradesForValidation} trades.`);
   }
 
-  if (result.expectancy <= 0 || result.totalTrades < 30) {
-    messages.push("Do not scale position size unless the last 30 trades show positive expectancy.");
+  if (result.expectancy <= tradingConfig.minimumExpectancyForValidation || result.totalTrades < tradingConfig.monteCarloPreferredTrades) {
+    messages.push(`Do not scale position size unless the last ${tradingConfig.monteCarloPreferredTrades} trades show positive expectancy.`);
   }
 
   messages.push("Sprint 2 cannot recommend real trading.");

@@ -1,7 +1,7 @@
 import { Command } from "commander";
+import { writeAndLogJsonReports } from "./cliOutput";
 import { analyzeTrades, type TradeJournalAnalysis } from "../journal/tradeAnalyzer";
 import { sampleTrades } from "../journal/sampleTrades";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 
 const program = new Command();
 
@@ -11,11 +11,12 @@ program
   .action(() => {
     const result = analyzeTrades(sampleTrades);
 
-    writeJsonReport("output/reports/trade-journal-analysis.json", result);
-    writeMarkdownReport("output/reports/trade-journal-analysis.md", journalMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log("Reports written to output/reports/trade-journal-analysis.json and output/reports/trade-journal-analysis.md");
+    writeAndLogJsonReports({
+      jsonPath: "output/reports/trade-journal-analysis.json",
+      markdownPath: "output/reports/trade-journal-analysis.md",
+      data: result,
+      markdown: journalMarkdown(result),
+    });
   });
 
 program.parse();

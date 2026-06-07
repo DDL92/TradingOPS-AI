@@ -1,6 +1,9 @@
 import { runBacktest } from "./backtestEngine";
+import { tradingConfig } from "../config/tradingConfig";
 import type { MarketCandle } from "../types/market.types";
 import type { Strategy } from "../types/strategy.types";
+
+export type SampleSizeQuality = "LOW" | "MODERATE" | "ACCEPTABLE";
 
 export type MonteCarloResult = {
   symbol: string;
@@ -15,6 +18,9 @@ export type MonteCarloResult = {
   probabilityOfTwentyPercentDrawdown: number;
   probabilityOfReachingTarget?: number;
   tradeReturnSamples: number;
+  tradeSampleSize: number;
+  sampleSizeQuality: SampleSizeQuality;
+  warnings: string[];
 };
 
 type SimulationRun = {
@@ -31,6 +37,8 @@ export function runMonteCarloSimulation(
 ): MonteCarloResult {
   const backtest = runBacktest(candles, strategy, startingCapital);
   const returns = backtest.trades.map((trade) => trade.pnlPercent / 100);
+  const sampleSizeQuality = classifySampleSize(returns.length);
+  const warnings = buildSampleWarnings(returns.length);
   const runs: SimulationRun[] = [];
   let seed = 42;
 
@@ -60,7 +68,32 @@ export function runMonteCarloSimulation(
     probabilityOfTwentyPercentDrawdown: round((drawdownRuns / simulations) * 100),
     ...(targetCapital !== undefined ? { probabilityOfReachingTarget: round((targetRuns / simulations) * 100) } : {}),
     tradeReturnSamples: returns.length,
+    tradeSampleSize: returns.length,
+    sampleSizeQuality,
+    warnings,
   };
+}
+
+function classifySampleSize(tradeCount: number): SampleSizeQuality {
+  if (tradeCount < tradingConfig.monteCarloMinimumTrades) return "LOW";
+  if (tradeCount < tradingConfig.monteCarloPreferredTrades) return "MODERATE";
+  return "ACCEPTABLE";
+}
+
+function buildSampleWarnings(tradeCount: number): string[] {
+  if (tradeCount < tradingConfig.monteCarloMinimumTrades) {
+    return [
+      `Very low trade sample: ${tradeCount} trades. Monte Carlo output is exploratory only and should not be treated as high confidence.`,
+    ];
+  }
+
+  if (tradeCount < tradingConfig.monteCarloPreferredTrades) {
+    return [
+      `Trade sample below preferred threshold: ${tradeCount}/${tradingConfig.monteCarloPreferredTrades}. Avoid strong confidence claims.`,
+    ];
+  }
+
+  return [];
 }
 
 function simulateReturnPath(returns: number[], startingCapital: number): SimulationRun {

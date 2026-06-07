@@ -7,5 +7,11 @@ export const tradingConfig = {
   maxDrawdownBeforeStopPercent: 15,
   minimumProfitFactorForPaperTrading: 1.3,
   minimumTradesForValidation: 20,
+  minimumWinRateForValidation: 40,
+  minimumExpectancyForValidation: 0,
   minimumWinRateForPaperTrading: 40,
+  monteCarloMinimumTrades: 10,
+  monteCarloPreferredTrades: 30,
+  walkForwardTrainingWindow: 60,
+  walkForwardTestingWindow: 20,
 } as const;

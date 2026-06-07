@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { z } from "zod";
+import { writeAndLogTableReports } from "./cliOutput";
 import { buildStrategyLeaderboard, type LeaderboardEntry } from "../ranking/strategyLeaderboard";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 
 const optionsSchema = z.object({
   symbol: z.string().default("BTC"),
@@ -19,11 +19,12 @@ program
     const leaderboard = buildStrategyLeaderboard(symbol);
     const basePath = `output/leaderboards/${symbol}-strategy-leaderboard`;
 
-    writeJsonReport(`${basePath}.json`, leaderboard);
-    writeMarkdownReport(`${basePath}.md`, leaderboardMarkdown(symbol, leaderboard));
-
-    console.table(
-      leaderboard.map((entry) => ({
+    writeAndLogTableReports({
+      jsonPath: `${basePath}.json`,
+      markdownPath: `${basePath}.md`,
+      data: leaderboard,
+      markdown: leaderboardMarkdown(symbol, leaderboard),
+      rows: leaderboard.map((entry) => ({
         rank: entry.rank,
         strategy: entry.strategyKey,
         score: entry.score,
@@ -34,8 +35,7 @@ program
         profitFactor: entry.metrics.profitFactor,
         drawdown: entry.metrics.maxDrawdownPercent,
       })),
-    );
-    console.log(`Reports written to ${basePath}.json and ${basePath}.md`);
+    });
   });
 
 program.parse();

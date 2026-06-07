@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runPaperTradingSession, type PaperTradingSession } from "../paperTrading/paperTradingEngine";
+import { logJsonResult, logReportPaths, writeCliReports } from "./cliOutput";
 import { getMarketData } from "../data/sampleMarketData";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
@@ -24,12 +24,17 @@ program
     const symbol = options.symbol.toUpperCase();
     const strategy = getStrategyByKey(options.strategy);
     const result = runPaperTradingSession(getMarketData(symbol), strategy, options.capital);
+    const jsonPath = "output/reports/paper-trade-session.json";
+    const markdownPath = "output/reports/paper-trade-session.md";
 
-    writeJsonReport("output/reports/paper-trade-session.json", result);
-    writeMarkdownReport("output/reports/paper-trade-session.md", paperTradeMarkdown(result));
-
-    console.log(JSON.stringify(toConsoleSummary(result), null, 2));
-    console.log("Reports written to output/reports/paper-trade-session.json and output/reports/paper-trade-session.md");
+    writeCliReports({
+      jsonPath,
+      markdownPath,
+      data: result,
+      markdown: paperTradeMarkdown(result),
+    });
+    logJsonResult(toConsoleSummary(result));
+    logReportPaths(jsonPath, markdownPath);
   });
 
 program.parse();

@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { projectGrowth, type GrowthProjectionResult } from "../backtesting/growthProjection";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
+import { writeAndLogJsonReports } from "./cliOutput";
 
 const optionsSchema = z.object({
   capital: z.coerce.number().positive(),
@@ -21,11 +21,12 @@ program
     const options = optionsSchema.parse(rawOptions);
     const result = projectGrowth(options.capital, options.target, options.months);
 
-    writeJsonReport("output/reports/growth-projection.json", result);
-    writeMarkdownReport("output/reports/growth-projection.md", growthMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log("Reports written to output/reports/growth-projection.json and output/reports/growth-projection.md");
+    writeAndLogJsonReports({
+      jsonPath: "output/reports/growth-projection.json",
+      markdownPath: "output/reports/growth-projection.md",
+      data: result,
+      markdown: growthMarkdown(result),
+    });
   });
 
 program.parse();

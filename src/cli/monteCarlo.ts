@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runMonteCarloSimulation, type MonteCarloResult } from "../backtesting/monteCarloSimulator";
+import { writeAndLogJsonReports } from "./cliOutput";
 import { getMarketData } from "../data/sampleMarketData";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
@@ -28,11 +28,12 @@ program
     const result = runMonteCarloSimulation(getMarketData(symbol), strategy, options.capital, options.target);
     const basePath = `output/backtests/${symbol}-${strategy.key}-montecarlo`;
 
-    writeJsonReport(`${basePath}.json`, result);
-    writeMarkdownReport(`${basePath}.md`, monteCarloMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log(`Reports written to ${basePath}.json and ${basePath}.md`);
+    writeAndLogJsonReports({
+      jsonPath: `${basePath}.json`,
+      markdownPath: `${basePath}.md`,
+      data: result,
+      markdown: monteCarloMarkdown(result),
+    });
   });
 
 program.parse();
@@ -43,6 +44,7 @@ function monteCarloMarkdown(result: MonteCarloResult): string {
       ? `- Target capital: $${result.targetCapital}
 - Probability of reaching target: ${result.probabilityOfReachingTarget}%`
       : "- Target capital: not provided";
+  const warnings = result.warnings.length === 0 ? "- None" : result.warnings.map((warning) => `- ${warning}`).join("\n");
 
   return `# Monte Carlo Report: ${result.symbol} ${result.strategy}
 
@@ -58,6 +60,11 @@ ${targetLine}
 - Probability of profit: ${result.probabilityOfProfit}%
 - Probability of 20% drawdown: ${result.probabilityOfTwentyPercentDrawdown}%
 - Trade return samples: ${result.tradeReturnSamples}
+- Trade sample size: ${result.tradeSampleSize}
+- Sample size quality: ${result.sampleSizeQuality}
+
+## Warnings
+${warnings}
 
 Monte Carlo output is based on local backtest returns and does not predict future performance.
 `;

@@ -21,12 +21,12 @@ export function evaluatePaperTradingApproval(metrics: BacktestMetrics): RiskAppr
     rejectionReasons.push(`Max drawdown must be <= ${tradingConfig.maxDrawdownBeforeStopPercent}%.`);
   }
 
-  if (metrics.expectancy <= 0) {
+  if (metrics.expectancy <= tradingConfig.minimumExpectancyForValidation) {
     rejectionReasons.push("Expectancy must be positive.");
   }
 
-  if (metrics.winRate < tradingConfig.minimumWinRateForPaperTrading) {
-    rejectionReasons.push(`Win rate must be >= ${tradingConfig.minimumWinRateForPaperTrading}%.`);
+  if (metrics.winRate < tradingConfig.minimumWinRateForValidation) {
+    rejectionReasons.push(`Win rate must be >= ${tradingConfig.minimumWinRateForValidation}%.`);
   }
 
   return {

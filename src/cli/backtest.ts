@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runBacktest } from "../backtesting/backtestEngine";
+import { writeAndLogJsonReports } from "./cliOutput";
 import { getMarketData } from "../data/sampleMarketData";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 import type { BacktestResult } from "../types/backtest.types";
 
@@ -27,11 +27,12 @@ program
     const result = runBacktest(candles, strategy, options.capital);
     const basePath = `output/backtests/${result.symbol}-${result.strategy}-backtest`;
 
-    writeJsonReport(`${basePath}.json`, result);
-    writeMarkdownReport(`${basePath}.md`, backtestMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log(`Reports written to ${basePath}.json and ${basePath}.md`);
+    writeAndLogJsonReports({
+      jsonPath: `${basePath}.json`,
+      markdownPath: `${basePath}.md`,
+      data: result,
+      markdown: backtestMarkdown(result),
+    });
   });
 
 program.parse();

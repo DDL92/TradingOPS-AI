@@ -1,3 +1,4 @@
+import { tradingConfig } from "../config/tradingConfig";
 import type { BacktestResult } from "../types/backtest.types";
 
 export type RiskLevel = "LOW" | "MODERATE" | "HIGH" | "EXTREME";
@@ -28,11 +29,19 @@ export function calculateRiskScore(result: BacktestResult, targetMonthlyReturnPe
 function buildReasons(result: BacktestResult, targetMonthlyReturnPercent: number): string[] {
   const reasons: string[] = [];
 
-  if (result.maxDrawdownPercent > 15) reasons.push("Drawdown exceeds the 15% protection threshold.");
-  if (result.profitFactor < 1.3) reasons.push("Profit factor is below the minimum validation threshold.");
-  if (result.winRate < 40) reasons.push("Win rate is below the minimum paper-trading threshold.");
-  if (result.totalTrades < 20) reasons.push("Trade sample is too small for strategy approval.");
-  if (result.expectancy <= 0) reasons.push("Expectancy is not positive.");
+  if (result.maxDrawdownPercent > tradingConfig.maxDrawdownBeforeStopPercent) {
+    reasons.push(`Drawdown exceeds the ${tradingConfig.maxDrawdownBeforeStopPercent}% protection threshold.`);
+  }
+  if (result.profitFactor < tradingConfig.minimumProfitFactorForPaperTrading) {
+    reasons.push("Profit factor is below the minimum validation threshold.");
+  }
+  if (result.winRate < tradingConfig.minimumWinRateForValidation) {
+    reasons.push("Win rate is below the minimum paper-trading threshold.");
+  }
+  if (result.totalTrades < tradingConfig.minimumTradesForValidation) {
+    reasons.push("Trade sample is too small for strategy approval.");
+  }
+  if (result.expectancy <= tradingConfig.minimumExpectancyForValidation) reasons.push("Expectancy is not positive.");
   if (targetMonthlyReturnPercent > 25) reasons.push("Target return is extremely aggressive.");
 
   return reasons.length > 0 ? reasons : ["Risk inputs are within current Sprint 2 research thresholds."];

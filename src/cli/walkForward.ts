@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { z } from "zod";
 import { runWalkForwardTest, type WalkForwardResult } from "../backtesting/walkForwardTester";
+import { writeAndLogJsonReports } from "./cliOutput";
 import { getMarketData } from "../data/sampleMarketData";
-import { writeJsonReport, writeMarkdownReport } from "../reports/reportBuilder";
 import { getStrategyByKey } from "../strategies/strategyRegistry";
 
 const optionsSchema = z.object({
@@ -24,11 +24,12 @@ program
     const result = runWalkForwardTest(getMarketData(symbol), strategy);
     const basePath = `output/backtests/${symbol}-${strategy.key}-walkforward`;
 
-    writeJsonReport(`${basePath}.json`, result);
-    writeMarkdownReport(`${basePath}.md`, walkForwardMarkdown(result));
-
-    console.log(JSON.stringify(result, null, 2));
-    console.log(`Reports written to ${basePath}.json and ${basePath}.md`);
+    writeAndLogJsonReports({
+      jsonPath: `${basePath}.json`,
+      markdownPath: `${basePath}.md`,
+      data: result,
+      markdown: walkForwardMarkdown(result),
+    });
   });
 
 program.parse();
@@ -38,6 +39,7 @@ function walkForwardMarkdown(result: WalkForwardResult): string {
     result.rejectionReasons.length === 0
       ? "- None"
       : result.rejectionReasons.map((reason) => `- ${reason}`).join("\n");
+  const warnings = result.warnings.length === 0 ? "- None" : result.warnings.map((warning) => `- ${warning}`).join("\n");
 
   const rows = result.windows
     .map(
@@ -52,14 +54,20 @@ Mode: simulation only. Real trading is disabled.
 
 ## Summary
 - Windows: ${result.numberOfWindows}
+- Training window size: ${result.trainingWindowSize}
+- Testing window size: ${result.testingWindowSize}
+- Profitable windows: ${result.profitableWindows}
 - Average return: ${result.averageReturn}%
 - Average drawdown: ${result.averageDrawdown}%
-- Profitable windows: ${result.profitableWindowsPercent}%
+- Profitable windows percent: ${result.profitableWindowPercent}%
 - Consistency score: ${result.consistencyScore}
 - Approved for further testing: ${result.approvedForFurtherTesting ? "Yes" : "No"}
 
 ## Rejection Reasons
 ${rejectionReasons}
+
+## Warnings
+${warnings}
 
 ## Windows
 | Window | Test Period | Return | Max Drawdown | Trades | Profitable |
